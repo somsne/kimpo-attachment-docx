@@ -46,6 +46,8 @@ const emit = defineEmits<{
   (e: 'download'): void;
   (e: 'about'): void;
   (e: 'new-comment'): void;
+  /** 插入链接：地址由上层经宿主输入框询问（插件不自带对话框，也不用浏览器原生 prompt）。 */
+  (e: 'insert-link'): void;
   (e: 'toggle-nav'): void;
   (e: 'toggle-review'): void;
   (e: 'toggle-ruler'): void;
@@ -158,9 +160,8 @@ function insertTable(rows: number, cols: number): void {
 function insertLink(): void {
   menu.value = null;
   if (props.readOnly) return;
-  // 链接地址用浏览器原生输入框（插件不自带对话框皮肤，宿主未提供输入框能力）
-  const href = window.prompt(props.t('docx.cmd.link_prompt'), 'https://');
-  if (href) props.engine.execute('link', { href });
+  // 链接地址交给上层经宿主输入框（ui.openPrompt）询问：HUI-07 禁止插件用浏览器原生 prompt
+  emit('insert-link');
 }
 
 function setPage(patch: Parameters<DocxEngine['setPageSetup']>[0]): void {

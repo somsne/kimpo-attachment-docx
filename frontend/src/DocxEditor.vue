@@ -30,6 +30,11 @@ const props = defineProps<{
   log: (level: 'info' | 'warn' | 'error', message: string, data?: Record<string, unknown>) => void;
   /** 单测注入假引擎；缺省加载随包引擎。 */
   loadEngine?: () => Promise<DocxEngineModule>;
+  /**
+   * 文本输入框（插入链接问地址）：由舞台经宿主 ui.openPrompt 提供；取消返回 null。
+   * 缺省或宿主没有输入框能力时按取消处理，不回退到浏览器原生 prompt（HUI-07）。
+   */
+  promptText?: (req: { title: string; defaultValue?: string }) => Promise<string | null>;
 }>();
 
 const emit = defineEmits<{
@@ -263,6 +268,21 @@ function newComment(): void {
   composing.value = true;
 }
 
+/** 功能区「链接」：地址经宿主输入框询问后交给引擎；输入框不可用（宿主未提供）按取消处理并记一条告警。 */
+async function insertLink(): Promise<void> {
+  const target = engine.value;
+  if (!target || props.readOnly || !props.promptText) return;
+  let href: string | null = null;
+  try {
+    href = await props.promptText({ title: props.t('docx.cmd.link_prompt'), defaultValue: 'https://' });
+  } catch (error) {
+    props.log('warn', 'link prompt unavailable, treated as cancel', { error: error instanceof Error ? error.message : String(error) });
+    return;
+  }
+  const trimmed = href?.trim() ?? '';
+  if (trimmed) target.execute('link', { href: trimmed });
+}
+
 function setZoom(event: Event): void {
   engine.value?.execute('zoom', Number((event.target as HTMLInputElement).value));
 }
@@ -313,6 +333,7 @@ defineExpose({ engine, snapshot, openFind });
       @download="emit('download')"
       @about="emit('about')"
       @new-comment="newComment"
+      @insert-link="insertLink"
       @toggle-nav="navOpen = !navOpen"
       @toggle-review="reviewOpen = !reviewOpen"
       @toggle-ruler="toggleRuler"

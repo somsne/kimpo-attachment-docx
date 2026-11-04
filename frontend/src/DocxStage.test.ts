@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import type { AttachmentEditSession, AttachmentOpenContext, AttachmentOpenMode } from '@kimposoft/plugin-sdk/attachment-open';
 import DocxStage from './DocxStage.vue';
+import DocxRibbon from './DocxRibbon.vue';
 import type { DocxEngine, DocxEngineModule, EngineSnapshot } from './engine-types';
 import { summarizeDocumentXml, type DocxSummary } from './docx-summary';
 import { documentXml, makeDocx, para } from './test-helpers';
@@ -138,8 +139,8 @@ async function makeCtx(options: { mode?: AttachmentOpenMode; canEdit?: boolean; 
 }
 
 const mounted: VueWrapper[] = [];
-function mountStage(ctx: MockCtx, loadEngine?: () => Promise<DocxEngineModule>) {
-  const wrapper = mount(DocxStage, { props: { ctx: ctx as unknown as AttachmentOpenContext, loadEngine }, attachTo: document.body });
+function mountStage(ctx: MockCtx, loadEngine?: () => Promise<DocxEngineModule>, extra: Record<string, unknown> = {}) {
+  const wrapper = mount(DocxStage, { props: { ctx: ctx as unknown as AttachmentOpenContext, loadEngine, ...extra }, attachTo: document.body });
   mounted.push(wrapper);
   return wrapper;
 }
@@ -427,5 +428,42 @@ describe('审阅栏', () => {
     expect(keys()).toContain('accept');
     await wrapper.get('[data-menu-key="table-add-row-after"]').trigger('click');
     expect(fake.engine.execute).toHaveBeenCalledWith('table-add-row-after');
+  });
+});
+
+describe('插入链接（HUI-07：地址经宿主输入框，不用浏览器原生 prompt）', () => {
+  it('宿主提供输入框：确认后把去空白的地址交给引擎；取消不执行', async () => {
+    const h = await makeCtx({ mode: 'edit' });
+    const fake = makeEngine({ summary: BASE });
+    const open = vi.fn<(req: unknown) => Promise<{ confirmed: boolean; value: string | null }>>(async () => ({ confirmed: true, value: ' https://kimposoft.com ' }));
+    const nativePrompt = vi.spyOn(window, 'prompt').mockImplementation(() => 'should-not-be-used');
+    const wrapper = mountStage(h.ctx, fake.loadEngine, { hostBridge: { ui: { prompt: { open } } } });
+    await settle();
+    wrapper.findComponent(DocxRibbon).vm.$emit('insert-link');
+    await settle();
+    expect(open).toHaveBeenCalledWith(expect.objectContaining({ title: '链接地址', defaultValue: 'https://', required: true }));
+    expect(fake.engine.execute).toHaveBeenCalledWith('link', { href: 'https://kimposoft.com' });
+    expect(nativePrompt).not.toHaveBeenCalled();
+
+    open.mockResolvedValueOnce({ confirmed: false, value: null });
+    fake.engine.execute.mockClear();
+    wrapper.findComponent(DocxRibbon).vm.$emit('insert-link');
+    await settle();
+    expect(fake.engine.execute).not.toHaveBeenCalledWith('link', expect.anything());
+    nativePrompt.mockRestore();
+  });
+
+  it('宿主没有输入框能力：按取消处理并记告警，仍不回退到原生 prompt', async () => {
+    const h = await makeCtx({ mode: 'edit' });
+    const fake = makeEngine({ summary: BASE });
+    const nativePrompt = vi.spyOn(window, 'prompt').mockImplementation(() => 'should-not-be-used');
+    const wrapper = mountStage(h.ctx, fake.loadEngine);
+    await settle();
+    wrapper.findComponent(DocxRibbon).vm.$emit('insert-link');
+    await settle();
+    expect(fake.engine.execute).not.toHaveBeenCalledWith('link', expect.anything());
+    expect(h.ctx.log).toHaveBeenCalledWith('warn', 'link prompt unavailable, treated as cancel', expect.any(Object));
+    expect(nativePrompt).not.toHaveBeenCalled();
+    nativePrompt.mockRestore();
   });
 });

@@ -21,6 +21,7 @@ import DocxEditor from './DocxEditor.vue';
 import { engineUrl, loadDocxEngine } from './engine-loader';
 import { useAttachmentI18n } from './i18n';
 import { useEditFlow } from './edit-flow';
+import { createHostUi } from '@kimposoft/plugin-sdk/ui';
 import { scanDocx, type GuardResult } from './guard';
 import { outlineOfDocx, type OutlineItem } from './outline';
 import { compareSummaries, describeDiff, summarizeDocx, type DocxSummary } from './docx-summary';
@@ -83,6 +84,14 @@ const guardText = computed(() => {
   );
   return t(canDownload.value ? 'docx.guard.banner' : 'docx.guard.banner_no_download', { items: items.join(t('docx.guard.separator')) });
 });
+
+/** 宿主 ui（输入框等）：HUI-07——插件不自带对话框皮肤，也不回退到浏览器原生 prompt。 */
+const hostUi = createHostUi(props.hostBridge);
+/** 给编辑器的文本输入框：取消 / 关闭返回 null；宿主没有输入框能力时 openPrompt 会 reject，由编辑器按取消处理。 */
+async function promptText(req: { title: string; defaultValue?: string }): Promise<string | null> {
+  const result = await hostUi.openPrompt({ title: req.title, defaultValue: req.defaultValue, required: true });
+  return result.confirmed ? result.value : null;
+}
 
 const flow = useEditFlow({
   ctx: props.ctx,
@@ -305,6 +314,7 @@ defineExpose({ flow, engine, status, guard });
         :can-download="canDownload"
         :log="ctx.log"
         :load-engine="loadEngine ?? loadEngineFromHost"
+        :prompt-text="promptText"
         @ready="onEditorReady"
         @change="onEditorChange"
         @error="onEditorError"
