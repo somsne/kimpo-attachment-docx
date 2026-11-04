@@ -1,0 +1,30 @@
+{
+  "plugin_id": "com.kimposoft.attachment-docx",
+  "version": "0.1.0",
+  "sdk_version": "1.1.0-tp.21",
+  "kimpo_version": ">=1.2.0",
+  "category": "attachment",
+  "trust_level": "verified",
+  "name": { "zh_CN": "文档附件", "en_US": "Document Attachment" },
+  "description": { "zh_CN": "Kimpo 附件插件：文档查看与编辑（docx-preview + SuperDoc），AGPL-3.0", "en_US": "Document Attachment plugin for Kimpo" },
+  "author": { "name": "KimpoSoft Team" },
+  "entry": { "frontend": "frontend/dist/plugin.umd.js" },
+  "i18n": { "namespace": "com.kimposoft.attachment-docx", "locales": ["zh-CN", "en-US", "ja-JP", "zh-TW"], "path": "frontend/locales", "default_locale": "zh-CN" },
+  "dependencies": { "platform": ">=1.2.0", "plugins": [] },
+  "permissions": { "network": [], "storage": false, "exec": false },
+  "lifecycle": { "allow_multiple_config_instances": false, "max_config_instances": 1 },
+  "capabilities": {
+    "frontend": {
+      "global_name": "KimpoPlugins.attachment_docx",
+      "bundle": "frontend/dist/plugin.umd.js",
+      "surfaces": [ { "id": "open", "type": "attachment.open", "priority": 10, "host_caps": ["i18n", "log", "theme", "ui.confirm", "ui.message"] } ]
+    },
+    "attachment_open": {
+      "accepts": { "mime": ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"], "ext": ["docx"] },
+      "modes": ["view", "edit"],
+      "priority": 10,
+      "max_source_bytes": 52428800
+    }
+  },
+  "schema_compatibility": { "frontend.surface": { "min_version": 1 } }
+}
