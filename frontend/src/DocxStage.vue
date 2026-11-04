@@ -18,6 +18,7 @@ import type { AttachmentOpenContext } from '@kimposoft/plugin-sdk/attachment-ope
 import Icon from './Icon.vue';
 import DocxViewer from './DocxViewer.vue';
 import DocxEditor from './DocxEditor.vue';
+import { engineUrl, loadDocxEngine } from './engine-loader';
 import { useAttachmentI18n } from './i18n';
 import { useEditFlow } from './edit-flow';
 import { scanDocx, type GuardResult } from './guard';
@@ -28,6 +29,8 @@ import type { DocxEngine, DocxEngineModule } from './engine-types';
 const props = defineProps<{
   ctx: AttachmentOpenContext;
   hostBridge?: unknown;
+  /** 宿主给的随包资源基地址（#768）：引擎包 superdoc/engine.js 据此定位。 */
+  assetBaseUrl?: string;
   /** 单测注入假引擎（生产不传）。 */
   loadEngine?: () => Promise<DocxEngineModule>;
 }>();
@@ -39,6 +42,8 @@ const SOURCE_REPO = 'https://github.com/somsne/kimpo-attachment-docx';
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
 const { t, dispose: disposeI18n } = useAttachmentI18n(props.hostBridge, props.ctx.env?.locale);
+/** 引擎包地址按宿主给的随包资源基地址定位（#768；缺键时 engineUrl 退回脚本地址）。 */
+const loadEngineFromHost = () => loadDocxEngine(engineUrl(props.assetBaseUrl || undefined));
 
 type Status = 'loading' | 'ready' | 'failed' | 'too_large';
 
@@ -299,7 +304,7 @@ defineExpose({ flow, engine, status, guard });
         :read-only="editorReadOnly"
         :can-download="canDownload"
         :log="ctx.log"
-        :load-engine="loadEngine"
+        :load-engine="loadEngine ?? loadEngineFromHost"
         @ready="onEditorReady"
         @change="onEditorChange"
         @error="onEditorError"

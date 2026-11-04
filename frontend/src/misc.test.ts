@@ -79,3 +79,10 @@ describe('engine-loader', () => {
     await expect(loadDocxEngine('')).resolves.toBe(mod);
   });
 });
+
+// #768：宿主给的 assetBaseUrl（目录地址）同样能推出引擎地址；blob: 脚本地址（宿主以已验证字节执行插件包）得空串。
+it('engineUrl：目录基地址拼出引擎地址，blob 地址得空串', async () => {
+  const { engineUrl } = await import('./engine-loader');
+  expect(engineUrl('https://h/api/v1/plugins/com.x/assets/frontend/')).toBe('https://h/api/v1/plugins/com.x/assets/frontend/superdoc/engine.js');
+  expect(engineUrl('blob:https://h/uuid')).toBe('');
+});

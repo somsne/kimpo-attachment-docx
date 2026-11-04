@@ -14,5 +14,6 @@ import DocxStage from './DocxStage.vue';
 
 export const createSurface = defineAttachmentOpenSurface(input => ({
   component: DocxStage,
-  props: { hostBridge: input.hostBridge }
+  // assetBaseUrl：宿主给的随包资源基地址（#768，引擎包 superdoc/engine.js 据此定位；老宿主缺键时退回脚本地址）
+  props: { hostBridge: input.hostBridge, assetBaseUrl: input.assetBaseUrl }
 }));
