@@ -67,7 +67,7 @@ let disposed = false;
 const canDownload = computed(() => props.ctx.permissions?.canDownload === true);
 const locale = computed(() => props.ctx.env?.locale || 'zh-CN');
 const timezone = computed(() => props.ctx.env?.timezone || '');
-/** 当前用户名：契约暂无此字段，按可选字段读取，缺省「未署名」（批注与修订署名用）。 */
+/** 当前用户名：契约 env.userDisplayName（somsne/kimpo#784，宿主与水印署名同源）；老宿主缺键时退回早期的可选字段，再缺省「未署名」（批注与修订署名用）。 */
 const userName = computed(() => {
   const loose = props.ctx as unknown as { user?: { displayName?: string }; env?: { userName?: string; userDisplayName?: string } };
   return loose.env?.userDisplayName || loose.env?.userName || loose.user?.displayName || t('docx.review.anonymous');
