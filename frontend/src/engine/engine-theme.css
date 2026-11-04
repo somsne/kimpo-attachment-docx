@@ -1,0 +1,16 @@
+/*
+ * SuperDoc 外观跟随宿主（文档附件插件编辑态，设计稿「文档插件 · 编辑态」）。只作用于插件的挂载容器内。
+ * 批注与修订一律在插件自绘的右侧审阅栏里处理：SuperDoc 自带的浮动批注气泡、右侧批注栏、批注对话框不显示
+ * （它们是英文界面、按浏览器本地时区显示时间，与设计稿不符）。正文里的批注高亮与修订标记保留。
+ */
+.kad-superdoc-host {
+  position: absolute;
+  inset: 0;
+}
+
+.kad-superdoc-host .superdoc__compact-comment-popover,
+.kad-superdoc-host .superdoc__right-sidebar,
+.kad-superdoc-host .floating-comments,
+.kad-superdoc-host .comments-dialog {
+  display: none !important;
+}

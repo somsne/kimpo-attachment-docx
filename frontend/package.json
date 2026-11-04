@@ -1,0 +1,42 @@
+{
+  "name": "@kimpo/attachment-docx-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "description": "Kimpo 附件插件（文档查看与编辑：docx-preview + SuperDoc）前端：surface attachment.open；产物 dist/plugin.umd.js + 随包编辑引擎 dist/superdoc/engine.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/somsne/kimpo-attachment-docx"
+  },
+  "scripts": {
+    "build": "vite build && vite build -c vite.engine.config.ts",
+    "test": "vitest run",
+    "test:bundle": "node --test scripts/bundle.test.mjs",
+    "typecheck": "vue-tsc --noEmit --skipLibCheck",
+    "fixtures": "node scripts/make-fixtures.mjs",
+    "roundtrip": "node scripts/roundtrip.mjs"
+  },
+  "peerDependencies": {
+    "vue": "^3.4.0"
+  },
+  "//": "@kimposoft/plugin-sdk 暂以 file: 指向主仓子模块源码（与登录页插件同口径）。依赖许可：superdoc AGPL-3.0（锁 1.47.2：2.x 起依赖专有闭源的 @superdoc/docx-engine、禁止再分发，不能用）；docx-preview Apache-2.0；jszip MIT OR GPL-3.0-or-later，本插件取 MIT 条款；docx（仅生成夹具，不进产物）MIT。逐项清单见 README「依赖与许可」。",
+  "dependencies": {
+    "@kimposoft/plugin-sdk": "file:../../kimpo-plugin-sdk/frontend",
+    "docx-preview": "0.4.1",
+    "jszip": "3.10.2",
+    "superdoc": "1.47.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "5.2.4",
+    "@vue/test-utils": "2.4.6",
+    "docx": "9.12.0",
+    "happy-dom": "20.9.0",
+    "jsdom": "27.4.0",
+    "typescript": "5.9.3",
+    "vite": "5.4.21",
+    "vitest": "3.2.4",
+    "vue": "3.5.39",
+    "vue-tsc": "2.2.12"
+  }
+}

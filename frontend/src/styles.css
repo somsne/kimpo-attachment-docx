@@ -1,0 +1,368 @@
+/*
+ * 文档附件插件公共样式（kimpo-attachment-docx，查看态与编辑态共用）。
+ * 一律挂在 .kad-root 下，不污染宿主页面；颜色全部取宿主主题变量（暗色随 html.dark），括号里是老宿主缺变量时的浅色回退。
+ * 页面（纸张）在暗色下也保持白纸。
+ */
+.kad-root {
+  --kad-bg: rgb(var(--container-bg-color, 255 255 255));
+  --kad-layout: rgb(var(--layout-bg-color, 244 245 247));
+  /* 页面区底色：画板为 #e9ebef（比 layout 底再深一档），用半透明黑叠在 layout 底上，暗色下同样加深 */
+  --kad-canvas: linear-gradient(rgba(0, 0, 0, 0.045), rgba(0, 0, 0, 0.045)), rgb(var(--layout-bg-color, 244 245 247));
+  --kad-text: rgb(var(--base-text-color, 27 31 36));
+  --kad-text-2: rgb(var(--text-secondary-color, 91 100 112));
+  --kad-border: rgb(var(--border-light-color, 227 230 235));
+  --kad-primary: rgb(var(--primary-color, 100 108 255));
+  --kad-primary-soft: rgb(var(--primary-color, 100 108 255) / 0.12);
+  --kad-primary-faint: rgb(var(--primary-color, 100 108 255) / 0.06);
+  --kad-warning: rgb(var(--warning-color, 250 173 20));
+  --kad-error: rgb(var(--error-color, 245 34 45));
+  --kad-warn-text: #8a5a00;
+  --kad-insert: #1d39c4;
+  --kad-delete: #d4380d;
+  --kad-page-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+}
+
+html.dark .kad-root {
+  --kad-warn-text: rgb(var(--warning-color, 250 173 20));
+  --kad-insert: #85a5ff;
+  --kad-delete: #ff9c6e;
+  --kad-page-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.kad-root button {
+  font-family: inherit;
+}
+
+.kad-root .kad-spacer {
+  flex: 1 1 auto;
+}
+
+.kad-root .kad-divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  margin: 0 6px;
+  background: var(--kad-border);
+}
+
+.kad-root .kad-icon-btn,
+.kad-root .kad-text-btn {
+  flex: none;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid var(--kad-border);
+  border-radius: 6px;
+  background: var(--kad-bg);
+  color: var(--kad-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.kad-root .kad-icon-btn {
+  width: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kad-root .kad-text-btn {
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.kad-root .kad-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kad-root .kad-icon-btn:hover:not(:disabled),
+.kad-root .kad-text-btn:hover:not(:disabled) {
+  border-color: var(--kad-primary);
+  color: var(--kad-primary);
+}
+
+.kad-root .kad-icon-btn.is-on {
+  background: var(--kad-primary-soft);
+  border-color: transparent;
+  color: var(--kad-primary);
+}
+
+.kad-root button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.kad-root .kad-spin {
+  animation: kad-spin 0.9s linear infinite;
+}
+
+@keyframes kad-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 导航窗格（查看态与编辑态同一套） */
+.kad-root .kad-nav {
+  flex: none;
+  width: 220px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--kad-bg);
+  border-right: 1px solid var(--kad-border);
+  font-size: 12px;
+}
+
+.kad-root .kad-nav-tabs {
+  flex: none;
+  display: flex;
+  gap: 12px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--kad-border);
+}
+
+.kad-root .kad-nav-tabs button {
+  padding: 10px 0 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--kad-text-2);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.kad-root .kad-nav-tabs button.is-active {
+  border-bottom-color: var(--kad-primary);
+  color: var(--kad-primary);
+  font-weight: 600;
+}
+
+.kad-root .kad-nav-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kad-root .kad-nav-item {
+  display: block;
+  width: 100%;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--kad-text);
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.kad-root .kad-nav-item.is-level-2 {
+  padding-left: 20px;
+}
+
+.kad-root .kad-nav-item.is-level-3 {
+  padding-left: 32px;
+}
+
+.kad-root .kad-nav-item:hover {
+  background: var(--kad-layout);
+}
+
+.kad-root .kad-nav-item.is-active {
+  background: var(--kad-primary-soft);
+  color: var(--kad-primary);
+}
+
+.kad-root .kad-nav-empty {
+  margin: 8px;
+  color: var(--kad-text-2);
+  line-height: 1.6;
+}
+
+/* 守门 / 占用条幅（设计稿 States ③） */
+.kad-root .kad-guard {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgb(var(--warning-color, 250 173 20) / 0.12);
+  border-bottom: 1px solid var(--kad-border);
+  color: var(--kad-warn-text);
+  font-size: 13px;
+}
+
+/* 失锁 / 保存失败条幅（设计稿 States ②） */
+.kad-root .kad-alert {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 16px;
+  padding: 10px 16px;
+  background: var(--kad-bg);
+  border: 1px solid var(--kad-error);
+  border-radius: 8px;
+  color: var(--kad-text);
+  font-size: 13px;
+}
+
+.kad-root .kad-alert > svg {
+  flex: none;
+  color: var(--kad-error);
+}
+
+.kad-root .kad-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.kad-root .kad-banner-btn {
+  flex: none;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--kad-border);
+  border-radius: 6px;
+  background: var(--kad-bg);
+  color: var(--kad-text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.kad-root .kad-banner-btn.is-primary {
+  border-color: transparent;
+  background: var(--kad-primary);
+  color: #ffffff;
+}
+
+.kad-root .kad-link-btn {
+  margin: 0 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--kad-primary);
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 浮层（下拉、调色板、表格网格） */
+.kad-root .kad-pop {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 140px;
+  box-sizing: border-box;
+  padding: 6px;
+  background: var(--kad-bg);
+  border: 1px solid var(--kad-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  color: var(--kad-text);
+}
+
+.kad-root .kad-menu-item {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--kad-text);
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.kad-root .kad-menu-item:hover,
+.kad-root .kad-menu-item.is-active {
+  background: var(--kad-primary-soft);
+  color: var(--kad-primary);
+}
+
+/* 对话框（关于、查找替换） */
+.kad-root .kad-dialog-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 72px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.kad-root .kad-dialog {
+  width: 420px;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+  padding: 20px 24px;
+  background: var(--kad-bg);
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+  color: var(--kad-text);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kad-root .kad-dialog-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.kad-root .kad-dialog p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--kad-text-2);
+}
+
+.kad-root .kad-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.kad-root .kad-input {
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--kad-border);
+  border-radius: 4px;
+  background: var(--kad-bg);
+  color: var(--kad-text);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+}
+
+.kad-root .kad-input:focus {
+  border-color: var(--kad-primary);
+}
+
+/* 整块状态（加载中、打开失败） */
+.kad-root .kad-state {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--kad-text-2);
+  font-size: 14px;
+}
