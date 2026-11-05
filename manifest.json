@@ -1,6 +1,6 @@
 {
   "plugin_id": "com.kimposoft.attachment-docx",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "sdk_version": "1.1.0-tp.21",
   "kimpo_version": ">=1.2.0",
   "category": "attachment",
