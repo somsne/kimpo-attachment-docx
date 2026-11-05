@@ -145,6 +145,41 @@ describe('createDocxEngine', () => {
     expect(engine.getSnapshot().trackChanges).toBe(false);
   });
 
+  it('#794：SuperDoc 挂在 body 下的隐藏编辑宿主被搬进插件挂载容器（就绪时与每次状态通知时都核）', () => {
+    // SuperDoc 的 PresentationEditor：真正的 ProseMirror 在 body 直属的隐藏宿主里
+    const makeWrapper = () => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'presentation-editor__hidden-host-wrapper';
+      const hidden = document.createElement('div');
+      hidden.className = 'presentation-editor__hidden-host';
+      const dom = document.createElement('div');
+      dom.className = 'ProseMirror';
+      dom.setAttribute('contenteditable', 'true');
+      hidden.appendChild(dom);
+      wrapper.appendChild(hidden);
+      document.body.appendChild(wrapper);
+      return { wrapper, dom };
+    };
+    const first = makeWrapper();
+    const { element, emit } = (() => {
+      const handlers: Record<string, Array<() => void>> = {};
+      state.editor = { ...state.editor, view: { dom: first.dom }, on: vi.fn((event: string, fn: () => void) => { (handlers[event] ??= []).push(fn); }) };
+      const el = document.createElement('div');
+      document.body.appendChild(el);
+      createDocxEngine({ element: el, file: new Blob(['x']), fileName: '合同.docx', user: { name: '张三' }, trackChanges: false, log: vi.fn() });
+      state.config!.onEditorCreate({ editor: state.editor });
+      state.config!.onReady({ superdoc: state.instance });
+      return { element: el, emit: (event: string) => handlers[event]?.forEach(fn => fn()) };
+    })();
+    const host = element.querySelector('.kad-superdoc-host')!;
+    expect(first.wrapper.parentElement).toBe(host);
+    // SuperDoc 重建了宿主（又挂回 body）：下一次状态通知时再搬一次
+    const second = makeWrapper();
+    state.editor.view.dom = second.dom;
+    emit('selectionUpdate');
+    expect(second.wrapper.parentElement).toBe(host);
+  });
+
   it('destroy 销毁 SuperDoc 与控制器并移除挂载容器', () => {
     const { engine, element } = setup();
     engine.destroy();

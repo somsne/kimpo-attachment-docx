@@ -173,6 +173,7 @@ export function createDocxEngine(options: DocxEngineOptions): DocxEngine {
       });
       attachScroll();
       recountWords();
+      adoptHiddenHost();
       readyFlag = true;
       rebaseline();
       log('info', '文档编辑引擎就绪', { trackChanges, pages });
@@ -197,6 +198,21 @@ export function createDocxEngine(options: DocxEngineOptions): DocxEngine {
       log('warn', 'SuperDoc 异常', { error: String((payload as { error?: unknown })?.error ?? payload) });
     }
   });
+
+  /**
+   * #794：SuperDoc 的演示式编辑器（PresentationEditor）把真正可编辑的 ProseMirror 放在 document.body 下的隐藏宿主
+   * （.presentation-editor__hidden-host-wrapper，fixed 定位到屏幕外），正文显示层只负责画。它在附件外壳的 DOM 之外，
+   * 外壳的焦点陷阱会把落到它上面的焦点抢回外壳（功能区第一个可聚焦元素），正文输入与拖选随之失效。
+   * 把这个宿主搬进插件自己的挂载容器：它仍是 fixed + 屏幕外，SuperDoc 按 DOM 引用使用它，搬家不影响渲染，
+   * 但从此它在外壳之内、焦点陷阱认它为内部。就绪与每次状态通知时各核一次，SuperDoc 重建宿主也能跟上。
+   */
+  function adoptHiddenHost(): void {
+    if (destroyed) return;
+    const dom = editor?.view?.dom as HTMLElement | undefined;
+    const wrapper = dom?.closest?.('.presentation-editor__hidden-host-wrapper') as HTMLElement | null | undefined;
+    if (!wrapper || wrapper.parentElement === host) return;
+    host.appendChild(wrapper);
+  }
 
   function commentsSignature(): string {
     const items: any[] = safe(() => ui?.comments?.getSnapshot?.()?.items ?? [], []);
@@ -282,6 +298,7 @@ export function createDocxEngine(options: DocxEngineOptions): DocxEngine {
   cleanups.push(() => scrollEl?.removeEventListener('scroll', updateCurrentPage));
 
   function queueNotify(): void {
+    adoptHiddenHost();
     if (notifyQueued || destroyed) return;
     notifyQueued = true;
     queueMicrotask(() => {
