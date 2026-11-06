@@ -182,7 +182,7 @@
   "docx.find.none": "見つかりません",
   "docx.find.replaced": "{n} 件置換しました",
   "docx.find.close": "閉じる",
-  "docx.about.title": "文書添付プラグインについて",
+  "docx.about.title": "文書エディターについて",
   "docx.about.version": "バージョン {v}",
   "docx.about.license": "このプラグインは AGPL-3.0 で公開されています。編集に SuperDoc {sd}（AGPL-3.0）、表示に docx-preview（Apache-2.0）を使用しています。",
   "docx.about.source": "ソースコード",

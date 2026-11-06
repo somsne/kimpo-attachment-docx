@@ -182,7 +182,7 @@
   "docx.find.none": "无结果",
   "docx.find.replaced": "已替换 {n} 处",
   "docx.find.close": "关闭",
-  "docx.about.title": "关于文档附件插件",
+  "docx.about.title": "关于文档编辑器",
   "docx.about.version": "版本 {v}",
   "docx.about.license": "本插件以 AGPL-3.0 许可发布：编辑使用 SuperDoc {sd}（AGPL-3.0），查看使用 docx-preview（Apache-2.0）。",
   "docx.about.source": "源码",

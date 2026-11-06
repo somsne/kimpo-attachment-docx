@@ -5,7 +5,7 @@
   "kimpo_version": ">=1.2.0",
   "category": "attachment",
   "trust_level": "verified",
-  "name": { "zh_CN": "文档附件", "en_US": "Document Attachment" },
+  "name": { "zh_CN": "文档编辑器", "en_US": "Document Editor" },
   "description": {
     "zh_CN": "Kimpo 附件插件：Word 文档（docx）查看与编辑（docx-preview + SuperDoc 1.47.2）。AGPL-3.0，源码 https://github.com/somsne/kimpo-attachment-docx",
     "en_US": "Kimpo attachment plugin: view and edit Word documents (docx) with docx-preview and SuperDoc 1.47.2. AGPL-3.0; source at https://github.com/somsne/kimpo-attachment-docx"

@@ -182,7 +182,7 @@
   "docx.find.none": "無結果",
   "docx.find.replaced": "已取代 {n} 處",
   "docx.find.close": "關閉",
-  "docx.about.title": "關於文件附件外掛",
+  "docx.about.title": "關於文件編輯器",
   "docx.about.version": "版本 {v}",
   "docx.about.license": "本外掛以 AGPL-3.0 授權發布：編輯使用 SuperDoc {sd}（AGPL-3.0），檢視使用 docx-preview（Apache-2.0）。",
   "docx.about.source": "原始碼",

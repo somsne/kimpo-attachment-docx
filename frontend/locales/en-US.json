@@ -182,7 +182,7 @@
   "docx.find.none": "No results",
   "docx.find.replaced": "Replaced {n}",
   "docx.find.close": "Close",
-  "docx.about.title": "About the Document Attachment plugin",
+  "docx.about.title": "About Document Editor",
   "docx.about.version": "Version {v}",
   "docx.about.license": "This plugin is released under AGPL-3.0. Editing uses SuperDoc {sd} (AGPL-3.0); viewing uses docx-preview (Apache-2.0).",
   "docx.about.source": "Source code",
